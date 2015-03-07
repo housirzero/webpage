@@ -1,0 +1,98 @@
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+        #top {width: 100%; height: 10%; overflow: hidden; margin:0; font-family:"微软雅黑";}
+        #allmap {width: 80%; height: 100%; float:left; overflow: hidden; margin:0; font-family:"微软雅黑";}
+        #right {width: 20%; height: 100%; float:right; overflow: hidden; margin:0; font-family:"微软雅黑";}
+        .HTitle{background-color:#BBE;	margin-top:0;}
+        .text{margin-top:10px;	margin-left:10%;}
+    </style>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=FWdSKnlekL0iPfFi3TGiCiLH"></script>
+    <script src="js/jquery.xdomainajax.js"></script>
+    <script src="js/jquery-1.8.0.min.js"></script>
+    <script src="js/jquery-1.8.0.js"></script>
+    <title>交通</title>
+</head>
+<body>
+<!-- 	<div id="top">
+		<p>拥堵路段</p>
+	</div> -->
+
+<div>
+    <div id="allmap"></div>
+    <div id="right">
+		<select>
+			<option>1</option>
+			<option>2</option>
+			<option>3</option>
+			<option>4</option>
+			<option>5</option>
+		</select>
+	</div>
+</div>
+</body>
+</html>
+
+<script src="json.data"></script>
+<script type="text/javascript">
+    // 百度地图API功能
+    var map = new BMap.Map("allmap");
+    var point = new BMap.Point(116.404, 39.915);
+    map.centerAndZoom(point, 12);
+    map.enableScrollWheelZoom();//启动鼠标滚轮缩放地图
+    map.enableKeyboard();//启动键盘操作地图
+
+    draw(jsonStr2);
+
+/*	setTimeout(function()
+	{
+		var marker = new BMap.Marker(points[j]); // 创建点
+		map.addOverlay(marker);
+		j++;
+	}, 1000 );*/
+    function draw(jsonStr){
+        var points = new Array(jsonStr.data.length);
+        var names = new Array(jsonStr.data.length);
+	//	var marker = new BMap.Marker(new BMap.Point(116.404, 39.915)); // 创建点
+        for(var i=0;i<jsonStr.data.length;i++) {
+			names[i] = jsonStr.data[i].name;
+			points[i] = new BMap.Point(jsonStr.data[i].lng, jsonStr.data[i].lat);
+			
+			if( i >= 0)
+			{
+			//	var marker = new BMap.Marker(points[i]); // 创建点
+			//	map.addOverlay(marker);
+			/*	var polyline = new BMap.Polyline([new BMap.Point(jsonStr.data[i-1].lng, jsonStr.data[i-1].lat),
+				new BMap.Point(jsonStr.data[i].lng, jsonStr.data[i].lat)], {strokeColor:"blue", strokeWeight:2, strokeOpacity:0.5});   //创建折线
+				map.addOverlay(polyline);   //增加折线
+				*/
+			}
+		}
+		var polyline = new BMap.Polyline(points, {strokeColor:"blue", strokeWeight:2, strokeOpacity:0.5});   //创建折线
+		map.addOverlay(polyline);   //增加折线
+		var j = 0;
+		setInterval(function()
+		{
+			if( j < jsonStr.data.length )
+			{
+				map.clearOverlays();
+				map.addOverlay(polyline);
+				var marker = new BMap.Marker(points[j]); // 创建点
+				map.addOverlay(marker);
+				j++;
+				console.info(j);
+			}
+		},400);
+	}
+
+    changeMapStyle('googlelite')
+    sel.value = 'googlelite';
+
+    function changeMapStyle(style){
+        map.setMapStyle({style:style});
+        $('#desc').html(mapstyles[style].desc);
+    }
+</script>
