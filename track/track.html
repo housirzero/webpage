@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<style type="text/css">
+		body, html{width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+		#allmap {width: 80%; height: 100%; float:left; overflow: hidden; margin:0; font-family:"微软雅黑";}
+		#option {width: 20%; height: 100%; float:right; overflow: hidden; margin-top:0; font-family:"微软雅黑"; background-color:#FFF;}
+
+	</style>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=FWdSKnlekL0iPfFi3TGiCiLH"></script>
+	<title>观察轨迹</title>
+</head>
+<body>
+	<div id="allmap"></div>
+	<div id="option">
+		<select id='person_select' onChange='updateSelect()'>
+			<option value='0'>0</option>
+		</select>
+	</div>
+</body>
+</html>
+
+<script type="text/javascript" src="track.json"></script>
+<script type="text/javascript">
+	// 百度地图API功能
+	var map = new BMap.Map("allmap");
+	map.centerAndZoom(new BMap.Point(116.404, 39.915), 15);
+	map.enableScrollWheelZoom();
+	
+	// var lines = [
+	//				[[lng, lat], [lng, lat], [lng, lat], [lng, lat]], // 线路1
+	//				[[lng, lat], [lng, lat], [lng, lat], [lng, lat]],
+	//				[[lng, lat], [lng, lat], [lng, lat], [lng, lat]],
+	//				];
+
+	/*var lines = [
+					[[116.399, 39.910],[116.405, 39.920],[116.423493, 39.907445]],
+					[[116.399, 39.945],[116.423493, 39.907445],[116.405, 39.920]]
+				];*/
+	//for(var i = 0; i < tracks.length; i++)
+	//	draw_track(map, tracks[i]);
+	//draw_track(map, tracks[10]);
+	
+	// track = [[116.399, 39.910],[116.405, 39.920],[116.423493, 39.907445]];
+	
+	var style = {
+		color : "black",
+		fontSize : "16px",
+		height : "20px",
+		lineHeight : "20px",
+		fontFamily:"微软雅黑"
+	}; 
+	
+	function draw_track(map, track) {
+		var all_lng = 0.0;
+		var all_lat = 0.0;
+		var len = track.length;
+		var points = new Array();
+		for(var i = 0; i < len; i++){
+			points[i] = new BMap.Point(track[i][0],track[i][1]);
+			all_lng += track[i][0];
+			all_lat += track[i][1];
+			var opts = {
+				position : points[i],    // 指定文本标注所在的地理位置
+				offset   : new BMap.Size(20, -20)    //设置文本偏移量
+			};
+			var label = new BMap.Label(i+'', opts);  // 创建文本标注对象
+			label.setStyle(style);
+			map.addOverlay(label); 
+		}
+		var polyline = new BMap.Polyline(points, {strokeColor:"blue", strokeWeight:2, strokeOpacity:0.5});   //创建折线
+		map.centerAndZoom(new BMap.Point(all_lng/len, all_lat/len), 13);
+		map.addOverlay(polyline);   //增加折线
+	}
+	
+	drawSelect(0, tracks.length-1);
+	updateSelect(tracks);
+	
+	
+	function drawSelect(min, max)
+	{
+		var inner = '';
+		for(var i = min; i <= max; i++)
+			inner += "<option value='" + i + "'>" + persons[i] + "</option>";
+		document.getElementById('person_select').innerHTML = inner;
+	}
+	
+	function updateSelect()
+	{
+		var index = document.getElementById('person_select').selectedIndex ;
+		map.clearOverlays();
+		draw_track(map, tracks[index]);
+	}
+
+	//map.setMapStyle({style:'googlelite'});
+
+</script>
+
